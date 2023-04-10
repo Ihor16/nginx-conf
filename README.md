@@ -33,7 +33,7 @@ server {
 
 ## How to enable HTTPS
 It's necessary to generate SSL certificates and mount them into the nginx container.
-The scripts in this repo use `certbot/dns-digitalocean`, so if you use another cloud provider, modify the script to use [another](!!! link) container.
+The scripts in this repo use `certbot/dns-digitalocean` container, so if you use another cloud provider, modify the script to use [another](!!! link) container.
 - Copy [Digital Ocean API](!!! link) token and put it in `/.secrets/certbot/digitalocean.ini` file, e.g.,
 ```ini
 dns_digitalocean_token = <your-token>
