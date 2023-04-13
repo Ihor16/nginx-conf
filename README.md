@@ -1,5 +1,5 @@
 ## Nginx Docker Configuration
-A Docker-Nginx setup that allows to
+A Nginx Docker setup that allows to
 - Host websites over HTTP
 - Generate a wildcard Letsencrypt SSL certificate to serve the websites over HTTPS
 
