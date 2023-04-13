@@ -1,55 +1,82 @@
 ## Nginx Docker Configuration
-An Nginx setup for Docker that includes
-- Configuration for hosting static webpages
-- Generation of SSL wildcard certificate for digital ocean
+A Docker-Nginx setup that allows to
+- Host websites over HTTP
+- Generate a wildcard Letsencrypt SSL certificate to serve the websites over HTTPS
 
-## How to serve a website
-- Clone the repo.
-- Start Nginx container.
+## Serving a Website
+- Update `.env` file with your information.
+- Copy your website into the `./sites/` directory.
+- Copy the nginx basic template into the repo's root directory.
 ```bash
-docker copose up -d
+cp ./configs/base/nginx.template.conf .
 ```
-- Put your website into the `./sites/` directory.
-- Update `./nginx.conf` file, e.g,
+- Update the root directive in the template file.
+```nginx
+root /sites/<website-directory-name>;
+```
+- Generate nginx config by filling in the template file with variables from `.env` and start the nginx container using this config.
+```bash
+./run.sh
+```
+- Verify that the website is accessible.
+```bash
+curl http://<domain>
+```
+
+## Serving Multiple Websites
+It's possible to server multiple websites from a single nginx container by using a wildcard domain.
+- Copy your other website into the `./sites/` directory.
+- Add a new `server` context to the template file.
 ```nginx
 server {
     listen <port>;
-    server_name <domain.com>;
-    root /sites/<website>;
+    server_name <sub>.${DOMAIN};
+    root /sites/<other-website-directory-name>;
 }
 ```
-- Verify that the website is accessible, e.g.,
+- Regenerate the nginx config and restart the docker compose.
 ```bash
-curl <domain.com>:<port>
+./run.sh
 ```
-- If you have a wildcard domain name, it's possible to server multiple websites from a single nginx container by adding a new `server` context, e.g.,
-```nginx
-server {
-    listen <port>;
-    server_name <subdomain>.<domain.com>;
-    root /sites/<other-website>;
-}
+- Verify that the website is accessible.
+```bash
+curl http://<sub>.<domain>
 ```
 
-## How to enable HTTPS
-It's necessary to generate SSL certificates and mount them into the nginx container.
-The scripts in this repo use `certbot/dns-digitalocean` container, so if you use another cloud provider, modify the script to use [another](!!! link) container.
-- Copy [Digital Ocean API](!!! link) token and put it in `/.secrets/certbot/digitalocean.ini` file, e.g.,
+## Enabling HTTPS
+To enable HTTPS, it's necessary to generate an SSL certificate and mount it into the nginx container.
+This repo's scripts use `certbot/dns-digitalocean` [container](https://certbot-dns-digitalocean.readthedocs.io/en/stable/) to generate a wildcard certificate for a domain, so if you use another cloud provider, modify these scripts to use [another](https://eff-certbot.readthedocs.io/en/stable/using.html#dns-plugins) container:
+- `./configs/ssl/create_cert.sh`
+- `./configs/ssl/renew_cert.sh`
+
+- Update `.env` file with your information.
+- Put your [Digital Ocean API](https://cloud.digitalocean.com/settings/api/tokens) token into `/.secrets/certbot/digitalocean.ini` file.
 ```ini
-dns_digitalocean_token = <your-token>
+dns_digitalocean_token = <token>
 ```
 - Change that file's permissions, so that it's accessible only by `root`.
 ```bash
 chmod go-rwx /.secrets/certbot/digitalocean.ini
 ```
-- Specify your domain in `./ssl/generate-ssl.sh`, e.g.,
-```bash
-$domain=domain.com
-```
 - Run `./ssl/generate-ssl.sh` and follow the instructions.
-- Replace `<your-domain>` by your actual domain in `./ssl/nginx.conf`.
-- Copy `./ssl/nginx.conf` into the repo's root directory, i.e., replace `./nginx.conf` file by `./ssl/nginx.conf`.
-- Add a cronjob to renew the certificate, e.g.,
+- Copy the nginx SSL template into the repo's root directory.
+```bash
+cp ./configs/ssl/nginx.template.conf .
+```
+- Regenerate the nginx config and restart the docker compose.
+```bash
+./run.sh
+```
+- Verify that the website is accessible over HTTPS.
+```bash
+curl https://<domain>
+```
+
+## Renewing SSL Certificate
+Letsencrypt certificates expire in [90 days](https://letsencrypt.org/2015/11/09/why-90-days.html), so it's necessary to renew them.
+One possible approach to automate the renewal is to add a cronjob to daily check if the certificate is due to renewal and renew it.
+
+- Add a cronjob to renew the certificate.
 ```bash
 # open a crontab editor
 crontab -e
@@ -57,11 +84,4 @@ crontab -e
 # add an entry to daily check whether the certificate should be renewed and renew it
 @daily ./<path-to-the-repo>/ssl/renew-ssl.sh
 ```
-- Reload the container
-```bash
-docker compose down && docker compose up -d
-```
-- Verify that the website is accessible over HTTPS, e.g.,
-```bash
-curl https://<domain.com>:<port>
-```
+
