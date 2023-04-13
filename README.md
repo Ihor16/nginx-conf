@@ -80,6 +80,6 @@ One possible approach to automate the renewal is to add a cronjob to daily check
 crontab -e
 
 # add an entry to daily check whether the certificate should be renewed and renew it
-@daily ./<path-to-the-repo>/ssl/renew-ssl.sh
+@daily bash <path-to-the-repo>/configs/ssl/renew_cert.sh
 ```
 
