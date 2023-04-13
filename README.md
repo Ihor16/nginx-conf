@@ -5,8 +5,8 @@ A Docker-Nginx setup that allows to
 
 ## Serving a Website
 - Update `.env` file with your information.
-- Copy your website into the `./sites/` directory.
-- Copy the nginx basic template into the repo's root directory.
+- Copy your website in the `./sites/` directory.
+- Copy the nginx basic template in the repo's root directory.
 ```bash
 cp ./configs/base/nginx.template.conf .
 ```
@@ -25,7 +25,7 @@ curl http://<domain>
 
 ## Serving Multiple Websites
 It's possible to server multiple websites from a single nginx container by using a wildcard domain.
-- Copy your other website into the `./sites/` directory.
+- Copy your other website in the `./sites/` directory.
 - Add a new `server` context to the template file.
 ```nginx
 server {
@@ -44,13 +44,11 @@ curl http://<sub>.<domain>
 ```
 
 ## Enabling HTTPS
-To enable HTTPS, it's necessary to generate an SSL certificate and mount it into the nginx container.
-This repo's scripts use `certbot/dns-digitalocean` [container](https://certbot-dns-digitalocean.readthedocs.io/en/stable/) to generate a wildcard certificate for a domain, so if you use another cloud provider, modify these scripts to use [another](https://eff-certbot.readthedocs.io/en/stable/using.html#dns-plugins) container:
-- `./configs/ssl/create_cert.sh`
-- `./configs/ssl/renew_cert.sh`
+To enable HTTPS, it's necessary to generate an SSL certificate and mount it in the nginx container.
+This repo's scripts use `certbot/dns-digitalocean` [container](https://certbot-dns-digitalocean.readthedocs.io/en/stable/) to generate a wildcard certificate for a domain, so if you use another cloud provider, modify `./configs/ssl/create_cert.sh` and `./configs/ssl/renew_cert.sh` scripts to use [another](https://eff-certbot.readthedocs.io/en/stable/using.html#dns-plugins) container.
 
 - Update `.env` file with your information.
-- Put your [Digital Ocean API](https://cloud.digitalocean.com/settings/api/tokens) token into `/.secrets/certbot/digitalocean.ini` file.
+- Put your [Digital Ocean API](https://cloud.digitalocean.com/settings/api/tokens) token in `/.secrets/certbot/digitalocean.ini` file.
 ```ini
 dns_digitalocean_token = <token>
 ```
@@ -59,7 +57,7 @@ dns_digitalocean_token = <token>
 chmod go-rwx /.secrets/certbot/digitalocean.ini
 ```
 - Run `./ssl/generate-ssl.sh` and follow the instructions.
-- Copy the nginx SSL template into the repo's root directory.
+- Copy the nginx SSL template in the repo's root directory.
 ```bash
 cp ./configs/ssl/nginx.template.conf .
 ```
