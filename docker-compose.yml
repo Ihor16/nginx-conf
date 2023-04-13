@@ -16,3 +16,12 @@ services:
     volumes:
       - ./sites/video-platform/app/:/sites/video-platform/app/:ro
 
+  node:
+    image: node:18
+    command: >
+      sh -c "cd /sites/ubc-explorer/ &&
+             yarn install &&
+             yarn start"
+    volumes:
+      - ./sites/ubc-explorer/:/sites/ubc-explorer/
+
