@@ -72,14 +72,14 @@ curl https://<domain>
 
 ## Renewing SSL Certificate
 Letsencrypt certificates expire in [90 days](https://letsencrypt.org/2015/11/09/why-90-days.html), so it's necessary to renew them.
-One possible approach to automate the renewal is to add a cronjob to daily check if the certificate is due to renewal and renew it.
+One possible approach to automate the renewal is to add a cronjob to check if the certificate is due to renewal and renew it.
 
 - Add a cronjob to renew the certificate.
 ```bash
 # open a crontab editor
 crontab -e
 
-# add an entry to daily check whether the certificate should be renewed and renew it
+# add an entry to check the certificate daily
 @daily bash <path-to-the-repo>/configs/ssl/renew_cert.sh
 ```
 
