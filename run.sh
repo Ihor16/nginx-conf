@@ -40,5 +40,7 @@ while read -r line; do
 done < .env
 
 # restarting docker compose
+docker container rm -f nginx-php-server-1
+docker container rm -f nginx-node-1
 docker compose down && docker compose up -d
 

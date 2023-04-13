@@ -16,6 +16,14 @@ services:
     volumes:
       - ./sites/video-platform/app/:/sites/video-platform/app/:ro
 
+  php-server:
+    image: ihor16/php-mysqli:8.2-fpm
+    command: > 
+      sh -c "cd /sites/php/ &&
+             php -S php-server:9999 show_request.php"
+    volumes:
+      - ./sites/php/:/sites/php/:ro
+
   node:
     image: node:18
     command: >
