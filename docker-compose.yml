@@ -12,9 +12,7 @@ services:
       - ./sites/:/sites/:ro
 
   php:
-    build:
-      context: .
-      dockerfile: ./sites/video-platform/docker/Dockerfile
+    image: ihor16/php-mysqli:8.2-fpm
     volumes:
-      - ./sites/video-platform/app/:/sites/video-platform/app/
+      - ./sites/video-platform/app/:/sites/video-platform/app/:ro
 
