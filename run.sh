@@ -9,18 +9,26 @@ if [[ -z "$1" ]]; then
     input="./nginx.template.conf"
 fi
 
+if [[ ! -e "$input" ]]; then
+    echo "error: no such template file"
+    exit 1
+fi
+
 res="./nginx.conf"
 cp "$input" "$res"
 
-# $1 - a line containing "key=value" pair
+# assigning word splitting by "="
+IFS="="
+
+# $1 - a line of "key=value" format
 # replaces all occurrences of "key" by "value" in $res file
 substitute () {
-    pair=$(echo "$1" | tr "=" "\n")
-    local array
-    for v in $pair; do
-        array+=("$v")
-    done
-    sed -i "s/\${${array[0]}}/${array[1]}/g" "$res"
+    # splitting $1 by $IFS and assigning the result to array $array
+    read -r -a array <<< "$1"
+    # trimming values
+    local k=$(echo ${array[0]} | xargs)
+    local v=$(echo ${array[1]} | xargs)
+    sed -i "s/\${$k}/$v/g" "$res"
 }
 
 # reading $input file by lines
