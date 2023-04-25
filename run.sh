@@ -39,8 +39,7 @@ while read -r line; do
     substitute "$line"
 done < .env
 
-# restarting docker compose
-docker container rm -f nginx-php-server-1
-docker container rm -f nginx-node-1
-docker compose down && docker compose up -d
-
+# restarting docker stack
+docker stack rm nginx
+sleep 1
+docker stack deploy -c docker-compose.yml nginx
