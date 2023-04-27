@@ -3,8 +3,8 @@ Based on [NGINX Fundamentals](https://www.udemy.com/course/nginx-fundamentals/) 
 
 
 ## Intro
-- `nginx -T` | getting current configurations
-- `nginx -V` | getting current version and installed modules
+- `nginx -T` | gets current configurations
+- `nginx -V` | gets current version and installed modules
 
 
 ## Configuration
@@ -159,7 +159,7 @@ server {
 - `nghttp2-client` | need this to benchmark the response timings
 - `nghttp -nys https://ihor16.com/index.html` | shows timings of received responses only the response for the specified file, i.e., `index.html`
 - `nghttp -nysa https://ihor16.com/index.html` | shows timings of received responses for the specified file and it's linked assets, e.g., `index.html` along with `style.css`
-- Pushing additional data to a client as a part of response
+- Pushes additional data to a client as a part of response
 ```nginx
 location = /index.html {
     # resources that will be pushed together with index.html
@@ -207,3 +207,52 @@ location = /van.jpg {
 - `server_tokens off;` | removes nginx version from the response header
 
 
+## Reverse Proxy
+- Redirects traffic to PHP server listening on port `9999`
+```nginx
+location /php {
+    proxy_pass "http://php-server:9999/";
+}
+```
+- Redirects traffic to another website
+```nginx
+location /org {
+    proxy_pass "http://nginx.org/";
+}
+```
+- `echo "Request path: " . $_SERVER["REQUEST_URI"];` | prints request path on PHP server
+- `add_header proxied nginx;` | adds a custom header `proxied: nginx` to the client
+- `var_dump(getallheaders());` | prints all headers received on PHP server
+- `proxy_set_header proxied nginx;` | adds a custom header `proxied: nginx` to the server
+- Creates a Round-Robin load balancer
+```nginx
+upstream php_servers {
+    server localhost:10001;
+    server localhost:10002;
+    server localhost:10003;
+}
+
+server {
+    listen 8888;
+    
+    location / {
+        proxy_pass http://php_servers;
+    }
+}
+```
+- Adds sticky IPs
+```nginx
+upstream php_servers {
+    ip_hash;
+    server localhost:10001;
+    server localhost:10002;
+}
+```
+- Adds redirections to the least busy server
+```nginx
+upstream php_servers {
+    least_conn;
+    server localhost:10001;
+    server localhost:10002;
+}
+```
