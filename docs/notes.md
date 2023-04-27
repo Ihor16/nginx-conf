@@ -224,3 +224,35 @@ location /org {
 - `add_header proxied nginx;` | adds a custom header `proxied: nginx` to the client
 - `var_dump(getallheaders());` | prints all headers received on PHP server
 - `proxy_set_header proxied nginx;` | adds a custom header `proxied: nginx` to the server
+- Creates a Round-Robin load balancer
+```nginx
+upstream php_servers {
+    server localhost:10001;
+    server localhost:10002;
+    server localhost:10003;
+}
+
+server {
+    listen 8888;
+    
+    location / {
+        proxy_pass http://php_servers;
+    }
+}
+```
+- Adds sticky IPs
+```nginx
+upstream php_servers {
+    ip_hash;
+    server localhost:10001;
+    server localhost:10002;
+}
+```
+- Adds redirections to the least busy server
+```nginx
+upstream php_servers {
+    least_conn;
+    server localhost:10001;
+    server localhost:10002;
+}
+```
